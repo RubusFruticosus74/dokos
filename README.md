@@ -1,2 +1,2 @@
 # dokos
-test of the dokos ERP
+test of the dokos ERP using docker
