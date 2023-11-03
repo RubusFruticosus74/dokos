@@ -23,6 +23,10 @@ x-backend-defaults: &backend_defaults
     - sites:/home/frappe/frappe-bench/sites
     - logs:/home/frappe/frappe-bench/logs
 
+x-extrahosts: &extrahosts    
+  extra_hosts:
+      mariadb: 172.17.0.1
+
 services:
   backend:
     <<: *backend_defaults
@@ -41,13 +45,20 @@ services:
         ls -1 apps > sites/apps.txt;
         bench set-config -g db_host $$DB_HOST;
         bench set-config -gp db_port $$DB_PORT;
+        bench set-config -g db_name $$DB_NAME;
+        bench set-config -g db_password $$MYSQL_ROOT_PASSWORD;
+        bench set-config -g admin_password $$MYSQL_ROOT_PASSWORD;
         bench set-config -g redis_cache "redis://$$REDIS_CACHE";
         bench set-config -g redis_queue "redis://$$REDIS_QUEUE";
         bench set-config -g redis_socketio "redis://$$REDIS_SOCKETIO";
         bench set-config -gp socketio_port $$SOCKETIO_PORT;
     environment:
-      DB_HOST: db
+      DB_HOST: mariadb
       DB_PORT: "3306"
+      DB_NAME: dockos
+      MARIADB_HOST: mariadb
+      MYSQL_ROOT_PASSWORD: admin
+      DB_ROOT_USER: root
       REDIS_CACHE: redis-cache:6379
       REDIS_QUEUE: redis-queue:6379
       REDIS_SOCKETIO: redis-socketio:6379
@@ -75,7 +86,7 @@ services:
     entrypoint: bash -c
     command:
       - >
-        wait-for-it -t 120 db:3306;
+        wait-for-it -t 120 $$DB_HOST:3306;
         wait-for-it -t 120 redis-cache:6379;
         wait-for-it -t 120 redis-queue:6379;
         wait-for-it -t 120 redis-socketio:6379;
@@ -94,6 +105,7 @@ services:
         echo "sites/common_site_config.json found";
         bench new-site frontend --no-mariadb-socket --admin-password=admin --db-root-password=admin --install-app dokos --install-app hrms --set-default || exit 0;
         echo; echo "Site creation completed successfully"; echo;
+        tail -f /dev/null;
 
   db:
     <<: *restart_on_failure
@@ -108,7 +120,12 @@ services:
       - --skip-character-set-client-handshake
       - --skip-innodb-read-only-compressed # Temporary fix for MariaDB 10.6
     environment:
+      DB_HOST: mariadb
+      DB_PORT: "3306"
+      MARIADB_HOST: mariadb
       MYSQL_ROOT_PASSWORD: admin
+      DB_ROOT_USER: root
+
     volumes:
       - db-data:/var/lib/mysql
 
