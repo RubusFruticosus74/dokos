@@ -47,9 +47,9 @@ services:
         ls -1 apps > sites/apps.txt;
         bench set-config -g db_host $$DB_HOST;
         bench set-config -gp db_port $$DB_PORT;
-        # bench set-config -g db_name $$DB_PORT;
-        # bench set-config -g db_password $$DB_PORT;
-        # bench set-config -g admin_password $$DB_PORT;                        
+        bench set-config -g db_name $$DB_NAME;
+        bench set-config -g db_password $$MYSQL_ROOT_PASSWORD;
+        bench set-config -g admin_password $$MYSQL_ROOT_PASSWORD;                        
         bench set-config -g redis_cache "redis://$$REDIS_CACHE";
         bench set-config -g redis_queue "redis://$$REDIS_QUEUE";
         bench set-config -g redis_socketio "redis://$$REDIS_SOCKETIO";
@@ -57,6 +57,7 @@ services:
     environment:
       DB_HOST: mariadb
       DB_PORT: "3306"
+      DB_NAME: dockos
       MARIADB_HOST: mariadb
       MYSQL_ROOT_PASSWORD: admin
       DB_ROOT_USER: root
@@ -85,7 +86,7 @@ services:
     entrypoint: bash -c
     command:
       - >
-        wait-for-it -t 120 db:3306;
+        wait-for-it -t 120 $$DB_HOST:3306;
         wait-for-it -t 120 redis-cache:6379;
         wait-for-it -t 120 redis-queue:6379;
         wait-for-it -t 120 redis-socketio:6379;
@@ -102,8 +103,8 @@ services:
           fi
         done;
         echo "sites/common_site_config.json found";
-        bench new-site frontend --no-mariadb-socket --admin-password=admin --db-root-password=admin --install-app dokos --install-app hrms --set-default || exit 0;
         echo; echo "Site creation completed successfully"; echo;
+        tail -f /dev/null;
 
     environment:
       DB_HOST: mariadb

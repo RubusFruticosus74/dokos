@@ -15,8 +15,8 @@ service mariadb restart
 #execute SQL command using credential in .my.cnf
 mysql -e "	"
 mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.19.0.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
-mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'dodo'@'172.18.0.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
-mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'frappe'@'172.18.0.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
+mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.18.0.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
+mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'dokos'@'172.18.0.%' IDENTIFIED BY 'dokosdbpassword1';FLUSH PRIVILEGES;"
 mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'frappe'@'172.%.%.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
 mysql -e "GRANT ALL PRIVILEGES ON _5e5899d8398b5f7b.* TO 'root'@'172.18.0.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
 
