@@ -14,14 +14,10 @@ service mariadb restart
 
 #execute SQL command using credential in .my.cnf
 mysql -e "	"
-mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.19.0.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
-mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'dodo'@'172.18.0.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
-mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'frappe'@'172.18.0.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
-mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'frappe'@'172.%.%.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
-mysql -e "GRANT ALL PRIVILEGES ON _5e5899d8398b5f7b.* TO 'root'@'172.18.0.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
+mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.18.0.%' IDENTIFIED BY 'admin' WITH GRANT OPTION;FLUSH PRIVILEGES;"
 
-bench new-site --no-mariadb-socket --mariadb-root-password admin --admin-password admin dokos
-
+#creation du site
+bench new-site --no-mariadb-socket --db-name=dokos --db-password=admin --db-host=mariadb --db-root-username=root --db-root-password=admin --admin-password=admin --verbose --force --install-app dokos --install-app hrms --set-default atelier36
 
 
 UPDATE mysql.user SET Host = '%' where User = 'dokos'; FLUSH PRIVILEGES;
