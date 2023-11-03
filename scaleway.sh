@@ -13,8 +13,19 @@ echo -e "[mysqld]\nbind-address = 0.0.0.0" >> /etc/mysql/my.cnf
 service mariadb restart
 
 #execute SQL command using credential in .my.cnf
+<<<<<<< HEAD
 mysql -e "	"
 mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.18.0.%' IDENTIFIED BY 'admin' WITH GRANT OPTION;FLUSH PRIVILEGES;"
+=======
+mysql -e "	"
+mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.19.0.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
+mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.18.0.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
+mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'dokos'@'172.18.0.%' IDENTIFIED BY 'dokosdbpassword1';FLUSH PRIVILEGES;"
+mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'frappe'@'172.%.%.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
+mysql -e "GRANT ALL PRIVILEGES ON _5e5899d8398b5f7b.* TO 'root'@'172.18.0.%' IDENTIFIED BY 'admin';FLUSH PRIVILEGES;"
+
+bench new-site --no-mariadb-socket --mariadb-root-password admin --admin-password admin dokos
+>>>>>>> 642646261d004ef83cebc20c3a276de8c0fd85e6
 
 #creation du site
 bench new-site --no-mariadb-socket --db-name=dokos --db-password=admin --db-host=mariadb --db-root-username=root --db-root-password=admin --admin-password=admin --verbose --force --install-app dokos --install-app hrms --set-default atelier36
