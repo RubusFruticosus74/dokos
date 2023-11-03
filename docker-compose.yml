@@ -1,3 +1,7 @@
+#remember to give root grant privilege option!!!!
+#mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.18.0.%' IDENTIFIED BY 'admin' WITH GRANT OPTION;FLUSH PRIVILEGES;"
+
+
 version: "3"
 
 name: dodock
@@ -17,15 +21,17 @@ x-restart-on-failure: &restart_on_failure
     restart_policy:
       condition: on-failure
 
+x-extrahosts: &extrahosts    
+  extra_hosts:
+      mariadb: 172.17.0.1
+
 x-backend-defaults: &backend_defaults
-  <<: [*depends_on_site_ready, *restart_on_failure, *image]
+  <<: [*depends_on_site_ready, *restart_on_failure, *image, *extrahosts]
   volumes:
     - sites:/home/frappe/frappe-bench/sites
     - logs:/home/frappe/frappe-bench/logs
 
-x-extrahosts: &extrahosts    
-  extra_hosts:
-      mariadb: 172.17.0.1
+
 
 services:
   backend:
@@ -65,12 +71,10 @@ services:
       SOCKETIO_PORT: "9000"
 
   create-site:
-    <<: *image
+    <<: [*image, *extrahosts]
     depends_on:
       configurator:
         condition: service_completed_successfully
-      db:
-        condition: service_started
       redis-cache:
         condition: service_started
       redis-queue:
@@ -103,22 +107,10 @@ services:
           fi
         done;
         echo "sites/common_site_config.json found";
-        bench new-site frontend --no-mariadb-socket --admin-password=admin --db-root-password=admin --install-app dokos --install-app hrms --set-default || exit 0;
+        bench new-site --no-mariadb-socket --db-name=dokos --db-password=admin --db-host=mariadb --db-root-username=root --db-root-password=admin --admin-password=admin --verbose --force --install-app dokos --install-app hrms --set-default atelier36;
         echo; echo "Site creation completed successfully"; echo;
-        tail -f /dev/null;
 
-  db:
-    <<: *restart_on_failure
-    image: mariadb:10.6
-    healthcheck:
-      test: mysqladmin ping -h localhost --password=admin
-      interval: 1s
-      retries: 15
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-      - --skip-character-set-client-handshake
-      - --skip-innodb-read-only-compressed # Temporary fix for MariaDB 10.6
+
     environment:
       DB_HOST: mariadb
       DB_PORT: "3306"
@@ -126,8 +118,6 @@ services:
       MYSQL_ROOT_PASSWORD: admin
       DB_ROOT_USER: root
 
-    volumes:
-      - db-data:/var/lib/mysql
 
   frontend:
     <<: *backend_defaults
@@ -183,7 +173,6 @@ services:
     command: node /home/frappe/frappe-bench/apps/frappe/socketio.js
 
 volumes:
-  db-data:
   redis-queue-data:
   redis-cache-data:
   redis-socketio-data:
