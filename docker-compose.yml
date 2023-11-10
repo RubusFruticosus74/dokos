@@ -36,8 +36,8 @@ x-backend-defaults: &backend_defaults
 services:
   backend:
     <<: *backend_defaults
-    extra_hosts:
-      localhost: 172.17.0.1
+    # extra_hosts:
+    #   localhost: 172.17.0.1
 
   configurator:
     <<: *backend_defaults
@@ -61,7 +61,7 @@ services:
     environment:
       DB_HOST: mariadb
       DB_PORT: "3306"
-      DB_NAME: dockos
+      DB_NAME: dokos
       MARIADB_HOST: mariadb
       MYSQL_ROOT_PASSWORD: admin
       DB_ROOT_USER: root
