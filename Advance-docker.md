@@ -31,8 +31,13 @@ docker build \
   --build-arg=NODE_VERSION=18.17.0 \
   --build-arg=APPS_JSON_BASE64=$APPS_JSON_BASE64 \
   --tag=custom-dokos:v4 \
-  --file=images/custom/Containerfile 
+  --file=images/custom/Containerfile .
+
 
 
  sed -i 's@frappe/erpnext:v15.11.0@custom-dokos:v4@g' pwd.yml H
 
+docker compose -p dokos -f pwd.yml up -d
+
+login:administrator
+pass:admin
