@@ -1,5 +1,7 @@
 #Original compose file from documentation: https://doc.dokos.io/dodock/installation/docker
 #with dbname added in bench new site command
+#Remove all docker volumes : docker volume rm $(docker volume ls -q)
+#Restore site bench --site [sitename] --force restore /path/to/SQLFILE
 version: "3"
 
 name: dodock
@@ -94,7 +96,7 @@ services:
           fi
         done;
         echo "sites/common_site_config.json found";
-        bench new-site frontend --no-mariadb-socket --db-name=dokos --admin-password=admin --db-root-password=admin --install-app dokos --install-app hrms --set-default || exit 0;
+        bench new-site frontend --no-mariadb-socket --db-name=dokos --admin-password=admin --db-root-password=admin --db-root-username=root --db-password=admin --verbose --force --install-app dokos --install-app hrms --install-app webshop --set-default || exit 0;
         echo; echo "Site creation completed successfully"; echo;
 
   db:
